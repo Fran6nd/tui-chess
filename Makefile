@@ -1,7 +1,9 @@
-tui-chess.o:
-	gcc -c src/main.c -o src/tui-chess.o
-tui-chess: tui-chess.o
-	gcc src/tui-chess.o -lncursesw -o tui-chess
+main.o:
+	gcc -c src/main.c -o src/main.o
+playground.o:
+	gcc -c src/playground.c -o src/playground.o
+tui-chess: main.o playground.o
+	gcc src/main.o src/playground.o -lncursesw -Lsrc/playground.h -o tui-chess
 clean:
 	rm src/*.o
 	rm tui-chess
