@@ -32,20 +32,27 @@ int main(int argc, char *argv[]) {
 
   plg_playground plg = plg_new();
 
-  int c;
+  int c = 0;
   do {
+
     plg_draw(&plg);
-    c = wgetch(stdscr);
     if (c != ERR) {
       if (c == KEY_MOUSE) {
         MEVENT event;
         if (getmouse(&event) == OK) {
-            move(event.y, event.x);
-            addch('x');
+          if (event.y >= LINES / 2 - 4 && event.y < LINES / 2 + 4) {
+            if (event.x >= COLS / 2 - 4*3 && event.x < COLS / 2 + 4*3) {
+              move(event.y, event.x);
+              addch('x');
+            }
+          }
+
         } else {
         }
       }
     }
+    c = wgetch(stdscr);
+
   } while (c != (int)'q');
   endwin();
 
