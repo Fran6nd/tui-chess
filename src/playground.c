@@ -84,6 +84,7 @@ static const char *plg_get_symbol(char id) {
 void plg_draw(plg_playground *plg) {
   int x, y;
   for (y = 0; y < 8; y++) {
+    move(LINES/2-4 + y, COLS/2-4);
     for (x = 0; x < 8; x++) {
       char color;
       if ((y % 2 == 1 && x % 2 == 0) || (y % 2 == 0 && x % 2 == 1)) {
@@ -97,6 +98,5 @@ void plg_draw(plg_playground *plg) {
       printw(" ");
       attroff(COLOR_PAIR(color));
     }
-    printw("\n");
   }
 }
