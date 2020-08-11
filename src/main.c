@@ -22,7 +22,7 @@
 #define BLACK_TILE 1
 #define WHITE_TILE 2
 
-const char *get_symbol(char id, int x, int y) {
+const char *get_symbol(char id) {
   switch (id) {
   case WHITE_KING:
     return "\xe2\x99\x94";
@@ -84,7 +84,7 @@ void new_table(char t[8][8]) {
   t[7][1] = WHITE_PAWN;
 
   int x, y;
-  for (x = 0; x < 7; x++) {
+  for (x = 0; x < 8; x++) {
     for (y = 2; y < 6; y++) {
       t[x][y] = EMPTY;
     }
@@ -110,29 +110,8 @@ void new_table(char t[8][8]) {
 
 void draw_table(char t[8][8]) {
   int x, y;
-  for (x = 0; x < 8; x++) {
-    for (y = 0; y < 8; y++)
-      printw(get_symbol(t[x][y], x, y));
-    printw("\n");
-  }
-}
-
-int main(int argc, char *argv[]) {
-  /*if (has_colors() == FALSE) {
-    endwin();
-    printf("Your terminal does not support color\n");
-    exit(1);
-  }*/
-  start_color();
-  init_pair(BLACK_TILE, COLOR_WHITE, COLOR_BLACK);
-  init_pair(WHITE_TILE, COLOR_BLACK, COLOR_WHITE);
-  setlocale(LC_ALL, "");
-
-  initscr();
-  new_table(table);
-  int x, y;
-  for (x = 0; x < 8; x++) {
-    for (y = 0; y < 8; y++) {
+  for (y = 0; y < 8; y++) {
+    for (x = 0; x < 8; x++) {
       char color;
       if ((y % 2 == 1 && x % 2 == 0) || (y % 2 == 0 && x % 2 == 1)) {
         color = WHITE_TILE;
@@ -140,11 +119,30 @@ int main(int argc, char *argv[]) {
         color = BLACK_TILE;
       }
       attron(COLOR_PAIR(color));
-      printw(get_symbol(table[x][y], x, y));
+      printw(" ");
+      printw(get_symbol(table[x][y]));
+      printw(" ");
       attroff(COLOR_PAIR(color));
     }
     printw("\n");
   }
+}
+
+int main(int argc, char *argv[]) {
+  setlocale(LC_ALL, "");
+  initscr();
+  curs_set(0);
+  if (has_colors() == FALSE) {
+    endwin();
+    printf("Your terminal does not support color\n");
+    exit(1);
+  }
+  start_color();
+  init_pair(BLACK_TILE, COLOR_BLACK, COLOR_BLUE);
+  init_pair(WHITE_TILE, COLOR_BLACK, COLOR_WHITE);
+
+  new_table(table);
+  draw_table(table);
 
   getch();
   endwin();
