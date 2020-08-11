@@ -83,6 +83,8 @@ static const char *plg_get_symbol(char id) {
 
 void plg_draw(plg_playground *plg) {
   int x, y;
+  move(LINES/2-6, COLS/2-4);
+  printw(plg->turn == TEAM_WHITE ? "TEAM WHITE      " : "TEAM BLACK      ");
   for (y = 0; y < 8; y++) {
     move(LINES/2-4 + y, COLS/2-4);
     for (x = 0; x < 8; x++) {
