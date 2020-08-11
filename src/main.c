@@ -4,6 +4,9 @@
 
 #include "playground.h"
 
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+
 char get_team(char id) {
   if (id == EMPTY)
     return EMPTY;
@@ -41,9 +44,14 @@ int main(int argc, char *argv[]) {
         MEVENT event;
         if (getmouse(&event) == OK) {
           if (event.y >= LINES / 2 - 4 && event.y < LINES / 2 + 4) {
-            if (event.x >= COLS / 2 - 4*3 && event.x < COLS / 2 + 4*3) {
-              move(event.y, event.x);
-              addch('x');
+            if (event.x >= COLS / 2 - 4 * 3 && event.x < COLS / 2 + 4 * 3) {
+              int i;
+              int j = 0;
+              for (i = event.x - 2; i > COLS / 2 - 4 * 3; i -= 3) {
+                j += 3;
+              }
+              move(event.y, COLS / 2 - 4 * 3 + j);
+              printw("xxx");
             }
           }
 
