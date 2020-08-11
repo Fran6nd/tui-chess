@@ -1,5 +1,6 @@
-#include <ncurses.h>
 #include "playground.h"
+#include <ncurses.h>
+#include <stdlib.h>
 
 plg_playground plg_new() {
   plg_playground pl;
@@ -83,10 +84,10 @@ static const char *plg_get_symbol(char id) {
 
 void plg_draw(plg_playground *plg) {
   int x, y;
-  move(LINES/2-6, COLS/2-4);
+  move(LINES / 2 - 4-2, COLS / 2 - 4*3);
   printw(plg->turn == TEAM_WHITE ? "TEAM WHITE      " : "TEAM BLACK      ");
   for (y = 0; y < 8; y++) {
-    move(LINES/2-4 + y, COLS/2-4);
+    move(LINES / 2 - 4 + y, COLS / 2 - 4*3);
     for (x = 0; x < 8; x++) {
       char color;
       if ((y % 2 == 1 && x % 2 == 0) || (y % 2 == 0 && x % 2 == 1)) {
@@ -101,4 +102,31 @@ void plg_draw(plg_playground *plg) {
       attroff(COLOR_PAIR(color));
     }
   }
+}
+
+plg_possibilities *plg_possibilities_new() {
+  plg_possibilities *possibilities =
+      (plg_possibilities *)malloc(sizeof(plg_possibilities));
+  possibilities->size = 0;
+  return possibilities;
+}
+
+void plg_possibilities_add(plg_possibilities *possibilities, plg_pos p) {
+  possibilities->size++;
+  if (possibilities->size == 0) {
+    void plg_possibilities_add(plg_possibilities * possibilities, plg_pos p) {
+      possibilities->list = (plg_pos *)malloc(sizeof(plg_pos));
+    }
+  } else {
+    possibilities->list = (plg_pos *)realloc(
+        possibilities->list, possibilities->size * sizeof(plg_pos));
+  }
+}
+
+plg_possibilities *plg_possibilities_get_at(plg_playground *plg, plg_pos p) {
+  plg_possibilities *possibilities = plg_possibilities_new();
+}
+void plg_possibilities_free(plg_possibilities *possibilities) {
+  free(possibilities->list);
+  free(possibilities);
 }
