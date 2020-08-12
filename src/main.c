@@ -32,13 +32,12 @@ int main(int argc, char *argv[]) {
   start_color();
   init_pair(BLACK_TILE, COLOR_BLACK, COLOR_BLUE);
   init_pair(WHITE_TILE, COLOR_BLACK, COLOR_WHITE);
+  init_pair(SELECTED_TILE, COLOR_BLACK, COLOR_RED);
 
   plg_playground plg = plg_new();
 
   int c = 0;
   do {
-
-    plg_draw(&plg);
     if (c != ERR) {
       if (c == KEY_MOUSE) {
         MEVENT event;
@@ -51,7 +50,11 @@ int main(int argc, char *argv[]) {
                 j += 3;
               }
               move(event.y, COLS / 2 - 4 * 3 + j);
-              printw("xxx");
+              plg_pos tmp = {
+                  .x = j/3,
+                  .y = event.y - (LINES/2-4)
+              };
+              plg_select(&plg, tmp);
             }
           }
 
@@ -59,6 +62,8 @@ int main(int argc, char *argv[]) {
         }
       }
     }
+    plg_draw(&plg);
+
     c = wgetch(stdscr);
 
   } while (c != (int)'q');

@@ -46,6 +46,13 @@ plg_playground plg_new() {
   pl.table[5][7] = BLACK_BISHOP;
   pl.table[6][7] = BLACK_KNIGHT;
   pl.table[7][7] = BLACK_ROOK;
+
+  pl.turn = TEAM_WHITE;
+  plg_pos p = {
+      .x = -1,
+      .y = -1,
+  };
+  pl.selection = p;
   return pl;
 }
 
@@ -90,7 +97,9 @@ void plg_draw(plg_playground *plg) {
     move(LINES / 2 - 4 + y, COLS / 2 - 4 * 3);
     for (x = 0; x < 8; x++) {
       char color;
-      if ((y % 2 == 1 && x % 2 == 0) || (y % 2 == 0 && x % 2 == 1)) {
+      if (y == plg->selection.y && x == plg->selection.x) {
+        color = SELECTED_TILE;
+      } else if ((y % 2 == 1 && x % 2 == 0) || (y % 2 == 0 && x % 2 == 1)) {
         color = WHITE_TILE;
       } else {
         color = BLACK_TILE;
@@ -128,4 +137,8 @@ plg_possibilities *plg_possibilities_get_at(plg_playground *plg, plg_pos p) {
 void plg_possibilities_free(plg_possibilities *possibilities) {
   free(possibilities->list);
   free(possibilities);
+}
+
+void plg_select(plg_playground * plg, plg_pos p){
+    plg->selection = p;
 }

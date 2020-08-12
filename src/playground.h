@@ -20,6 +20,7 @@
 
 #define BLACK_TILE 1
 #define WHITE_TILE 2
+#define SELECTED_TILE 3
 
 typedef struct position plg_pos;
 struct position {
@@ -36,10 +37,12 @@ typedef struct playground plg_playground;
 struct playground {
   char table[8][8];
   char turn;
+  plg_pos selection;
 };
 plg_playground plg_new();
 void plg_draw(plg_playground *);
 plg_possibilities *plg_possibilities_get_at(plg_playground *, plg_pos);
+void plg_select(plg_playground *, plg_pos);
 void plg_possibilities_free(plg_possibilities *);
 
 #endif
