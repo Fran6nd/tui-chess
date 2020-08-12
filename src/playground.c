@@ -2,6 +2,19 @@
 #include <ncurses.h>
 #include <stdlib.h>
 
+void plg_flip_map(plg_playground *plg) {
+  int x, y;
+  for (y = 0; y < 4; y++) {
+    for (x = 0; x < 8; x++) {
+      int y_bis = 7 - y;
+      char tmp = plg->table[x][y];
+      plg->table[x][y] = plg->table[x][y_bis];
+      plg->table[x][y_bis] = tmp;
+    }
+  }
+  plg->top_team = plg->top_team == TEAM_WHITE ? TEAM_BLACK : TEAM_WHITE;
+}
+
 plg_playground plg_new() {
   plg_playground pl;
   pl.turn = TEAM_WHITE;
@@ -54,6 +67,8 @@ plg_playground plg_new() {
       .y = -1,
   };
   pl.selection = p;
+  pl.top_team = TEAM_WHITE;
+  plg_flip_map(&pl);
   return pl;
 }
 
@@ -175,7 +190,7 @@ int plg_position_is_valid(plg_playground *plg, char team, plg_pos target,
 
 int plg_possibilities_add(plg_playground *plg, plg_possibilities *possibilities,
                           int x, int y, int mvt) {
-  if (plg->turn == TEAM_BLACK) {
+  if (plg->turn != plg->top_team) {
     x = -x;
     y = -y;
   }
@@ -344,7 +359,8 @@ void plg_move(plg_playground *plg, plg_pos from, plg_pos to) {
   plg_possibilities_free(&plg->possibilities);
   plg->table[to.x][to.y] = plg->table[from.x][from.y];
   plg->table[from.x][from.y] = EMPTY;
-  if (to.y == ((plg->turn == TEAM_WHITE) ? 7 : 0) && (plg->table[to.x][to.y] & PAWN) == PAWN) {
+  if (to.y == ((plg->turn == TEAM_WHITE) ? 7 : 0) &&
+      (plg->table[to.x][to.y] & PAWN) == PAWN) {
     plg->table[to.x][to.y] =
         ((plg->turn == TEAM_WHITE) ? WHITE_QUEEN : BLACK_QUEEN);
   }

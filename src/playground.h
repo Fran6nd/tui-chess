@@ -51,6 +51,7 @@ struct playground {
   char turn;
   plg_pos selection;
   plg_possibilities possibilities;
+  char top_team;
 };
 plg_playground plg_new();
 void plg_draw(plg_playground *);
