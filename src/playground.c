@@ -211,6 +211,16 @@ void plg_possibilities_get_at(plg_playground *plg) {
       plg_possibilities_add(plg, &plg->possibilities, 1, -2, MVT_CAN_EAT);
       plg_possibilities_add(plg, &plg->possibilities, -1, -2, MVT_CAN_EAT);
       break;
+    case KING:
+      plg_possibilities_add(plg, &plg->possibilities, -1, 1, MVT_CAN_EAT);
+      plg_possibilities_add(plg, &plg->possibilities, -1, -1, MVT_CAN_EAT);
+      plg_possibilities_add(plg, &plg->possibilities, 1, -1, MVT_CAN_EAT);
+      plg_possibilities_add(plg, &plg->possibilities, 1, 1, MVT_CAN_EAT);
+      plg_possibilities_add(plg, &plg->possibilities, 0, 1, MVT_CAN_EAT);
+      plg_possibilities_add(plg, &plg->possibilities, 1, 0, MVT_CAN_EAT);
+      plg_possibilities_add(plg, &plg->possibilities, 0, -1, MVT_CAN_EAT);
+      plg_possibilities_add(plg, &plg->possibilities, -1, 0, MVT_CAN_EAT);
+      break;
 
     default:
       break;
