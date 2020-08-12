@@ -57,5 +57,6 @@ void plg_draw(plg_playground *);
 void plg_possibilities_get_at(plg_playground *);
 void plg_select(plg_playground *, plg_pos);
 void plg_possibilities_free(plg_possibilities *);
+void plg_move(plg_playground * plg, plg_pos from, plg_pos to);
 
 #endif

@@ -35,20 +35,30 @@ int main(int argc, char *argv[]) {
       if (c == KEY_MOUSE) {
         MEVENT event;
         if (getmouse(&event) == OK) {
-          if (event.y >= LINES / 2 - 4 && event.y < LINES / 2 + 4) {
-            if (event.x >= COLS / 2 - 4 * 3 && event.x < COLS / 2 + 4 * 3) {
-              int i;
-              int j = 0;
-              for (i = event.x - 2; i > COLS / 2 - 4 * 3; i -= 3) {
-                j += 3;
+          if (event.bstate & (0x4 | 0x8)) {
+            if (event.y >= LINES / 2 - 4 && event.y < LINES / 2 + 4) {
+              if (event.x >= COLS / 2 - 4 * 3 && event.x < COLS / 2 + 4 * 3) {
+                int i;
+                int j = 0;
+                for (i = event.x - 2; i > COLS / 2 - 4 * 3; i -= 3) {
+                  j += 3;
+                }
+                plg_pos tmp = {.x = j / 3, .y = event.y - (LINES / 2 - 4)};
+                int done = 0;
+                for (i = 0; i < plg.possibilities.size; i++) {
+                  if (plg.possibilities.list[i].x == tmp.x &&
+                      plg.possibilities.list[i].y == tmp.y) {
+                    done = 1;
+                    plg_move(&plg, plg.selection, tmp);
+                  }
+                }
+                if (!done)
+                  plg_select(&plg, tmp);
               }
-              move(event.y, COLS / 2 - 4 * 3 + j);
-              plg_pos tmp = {.x = j / 3, .y = event.y - (LINES / 2 - 4)};
-              plg_select(&plg, tmp);
             }
-          }
 
-        } else {
+          } else {
+          }
         }
       }
     }

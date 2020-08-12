@@ -248,3 +248,10 @@ void plg_select(plg_playground *plg, plg_pos p) {
   plg->selection.x = -1;
   plg->selection.y = -1;
 }
+void plg_move(plg_playground *plg, plg_pos from, plg_pos to) {
+  plg->selection.x = -1;
+  plg->selection.y = -1;
+  plg_possibilities_free(&plg->possibilities);
+  plg->table[to.x][to.y] = plg->table[from.x][from.y];
+  plg->table[from.x][from.y] = EMPTY;
+}
