@@ -140,21 +140,23 @@ plg_possibilities *plg_possibilities_new() {
   possibilities->list = NULL;
   return possibilities;
 }
-
+/* return 0: no move, 1 move on emty, 2 move & eat. */
 int plg_position_is_valid(plg_playground *plg, char team, plg_pos target,
                           int mvt) {
   if (target.x >= 0 && target.y >= 0 && target.x < 8 && target.y < 8) {
     switch (mvt) {
     case MVT_CAN_EAT:
-      if ((team != plg_get_team(plg->table[target.x][target.y])) ||
-          (plg->table[target.x][target.y] == EMPTY)) {
+      if (plg->table[target.x][target.y] == EMPTY) {
         return 1;
+      } else if (team != plg_get_team(plg->table[target.x][target.y])) {
+        return 2;
       }
+
       break;
     case MVT_MUST_EAT:
       if ((team & 0x0F != plg->table[target.x][target.y] & 0x0F) &&
           (plg->table[target.x][target.y] != EMPTY)) {
-        return 1;
+        return 2;
       }
       break;
     case MVT_CANT_EAT:
@@ -165,8 +167,9 @@ int plg_position_is_valid(plg_playground *plg, char team, plg_pos target,
     default:
       break;
     }
+
+    return 0;
   }
-  return 0;
 }
 
 int plg_possibilities_add(plg_playground *plg, plg_possibilities *possibilities,
@@ -177,8 +180,10 @@ int plg_possibilities_add(plg_playground *plg, plg_possibilities *possibilities,
   };
   p.x += plg->selection.x;
   p.y += plg->selection.y;
-  if (!plg_position_is_valid(
-          plg, plg_get_team(plg->table[plg->selection.x][plg->selection.y]), p, mvt))
+  int ret = plg_position_is_valid(
+      plg, plg_get_team(plg->table[plg->selection.x][plg->selection.y]), p,
+      mvt);
+  if (!ret)
     return 0;
   possibilities->size++;
   if (possibilities->size == 1) {
@@ -189,39 +194,63 @@ int plg_possibilities_add(plg_playground *plg, plg_possibilities *possibilities,
         possibilities->list, possibilities->size * sizeof(plg_pos));
   }
   possibilities->list[possibilities->size - 1] = p;
-  return 1;
+  return ret;
+}
+
+void plg_possibilities_get_rook(plg_playground *plg) {
+  int x = 0, y = 0;
+  int i;
+  for (i = x + 1; i < 8; i++) {
+    if (!plg_possibilities_add(plg, &plg->possibilities, x + i, y,
+                               MVT_CAN_EAT)) {
+      break;
+    }
+    for (i = x - 1; i > -8; i--) {
+      if (!plg_possibilities_add(plg, &plg->possibilities, x + i, y,
+                                 MVT_CAN_EAT)) {
+        break;
+      }
+    }
+  }
 }
 
 void plg_possibilities_get_bishop(plg_playground *plg) {
-  {
-    int x = 1, y = 1;
-    for (y = 1; y < 8; y++) {
-      if (!plg_possibilities_add(plg, &plg->possibilities, x, y, MVT_CAN_EAT)) {
-        break;
-      }
-      x++;
+
+  int x = 1, y = 1;
+  for (y = 1; y < 8; y++) {
+    int ret =
+        plg_possibilities_add(plg, &plg->possibilities, x, y, MVT_CAN_EAT);
+    if (ret == 0 || ret == 2) {
+      break;
     }
-    x = 1;
-    for (y = -1; y > -8; y--) {
-      if (!plg_possibilities_add(plg, &plg->possibilities, x, y, MVT_CAN_EAT)) {
-        break;
-      }
-      x++;
+    x++;
+  }
+  x = 1;
+  for (y = -1; y > -8; y--) {
+    int ret =
+        plg_possibilities_add(plg, &plg->possibilities, x, y, MVT_CAN_EAT);
+    if (ret == 0 || ret == 2) {
+      break;
     }
-    y = 1;
-    for (x = -1; x > -8; x--) {
-      if (!plg_possibilities_add(plg, &plg->possibilities, x, y, MVT_CAN_EAT)) {
-        break;
-      }
-      y++;
+    x++;
+  }
+  y = 1;
+  for (x = -1; x > -8; x--) {
+    int ret =
+        plg_possibilities_add(plg, &plg->possibilities, x, y, MVT_CAN_EAT);
+    if (ret == 0 || ret == 2) {
+      break;
     }
-    y = -1;
-    for (x = -1; x > -8; x--) {
-      if (!plg_possibilities_add(plg, &plg->possibilities, x, y, MVT_CAN_EAT)) {
-        break;
-      }
-      y--;
+    y++;
+  }
+  y = -1;
+  for (x = -1; x > -8; x--) {
+    int ret =
+        plg_possibilities_add(plg, &plg->possibilities, x, y, MVT_CAN_EAT);
+    if (ret == 0 || ret == 2) {
+      break;
     }
+    y--;
   }
 }
 
