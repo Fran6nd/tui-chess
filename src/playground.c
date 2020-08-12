@@ -198,7 +198,19 @@ void plg_possibilities_get_at(plg_playground *plg) {
     case PAWN: {
       if (plg_possibilities_add(plg, &plg->possibilities, 0, 1, MVT_CANT_EAT))
         plg_possibilities_add(plg, &plg->possibilities, 0, 2, MVT_CANT_EAT);
+      plg_possibilities_add(plg, &plg->possibilities, 1, 1, MVT_MUST_EAT);
+      plg_possibilities_add(plg, &plg->possibilities, -1, 1, MVT_MUST_EAT);
     } break;
+    case KNIGHT:
+      plg_possibilities_add(plg, &plg->possibilities, -2, 1, MVT_CAN_EAT);
+      plg_possibilities_add(plg, &plg->possibilities, -2, -1, MVT_CAN_EAT);
+      plg_possibilities_add(plg, &plg->possibilities, 2, 1, MVT_CAN_EAT);
+      plg_possibilities_add(plg, &plg->possibilities, 2, -1, MVT_CAN_EAT);
+      plg_possibilities_add(plg, &plg->possibilities, 1, 2, MVT_CAN_EAT);
+      plg_possibilities_add(plg, &plg->possibilities, -1, 2, MVT_CAN_EAT);
+      plg_possibilities_add(plg, &plg->possibilities, 1, -2, MVT_CAN_EAT);
+      plg_possibilities_add(plg, &plg->possibilities, -1, -2, MVT_CAN_EAT);
+      break;
 
     default:
       break;
