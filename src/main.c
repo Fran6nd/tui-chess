@@ -7,14 +7,6 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
-char get_team(char id) {
-  if (id == EMPTY)
-    return EMPTY;
-  if (id < 6)
-    return TEAM_WHITE;
-  return TEAM_BLACK;
-}
-
 int main(int argc, char *argv[]) {
   setlocale(LC_ALL, "");
   initscr();
@@ -33,6 +25,7 @@ int main(int argc, char *argv[]) {
   init_pair(BLACK_TILE, COLOR_BLACK, COLOR_BLUE);
   init_pair(WHITE_TILE, COLOR_BLACK, COLOR_WHITE);
   init_pair(SELECTED_TILE, COLOR_BLACK, COLOR_RED);
+  init_pair(POSSIBILITY, COLOR_BLACK, COLOR_GREEN);
 
   plg_playground plg = plg_new();
 
@@ -50,10 +43,7 @@ int main(int argc, char *argv[]) {
                 j += 3;
               }
               move(event.y, COLS / 2 - 4 * 3 + j);
-              plg_pos tmp = {
-                  .x = j/3,
-                  .y = event.y - (LINES/2-4)
-              };
+              plg_pos tmp = {.x = j / 3, .y = event.y - (LINES / 2 - 4)};
               plg_select(&plg, tmp);
             }
           }

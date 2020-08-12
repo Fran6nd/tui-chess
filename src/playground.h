@@ -1,26 +1,38 @@
 #ifndef PLAYGROUND_H
 #define PLAYGROUND_H
 
-#define WHITE_KING 0
-#define WHITE_QUEEN 1
-#define WHITE_ROOK 2
-#define WHITE_BISHOP 3
-#define WHITE_KNIGHT 4
-#define WHITE_PAWN 5
-#define BLACK_KING 6
-#define BLACK_QUEEN 7
-#define BLACK_ROOK 8
-#define BLACK_BISHOP 9
-#define BLACK_KNIGHT 10
-#define BLACK_PAWN 11
-#define EMPTY 12
+#define WHITE_KING 0x12
+#define WHITE_QUEEN 0x22
+#define WHITE_ROOK 0x32
+#define WHITE_BISHOP 0x42
+#define WHITE_KNIGHT 0x52
+#define WHITE_PAWN 0x62
+#define BLACK_KING 0x11
+#define BLACK_QUEEN 0x21
+#define BLACK_ROOK 0x31
+#define BLACK_BISHOP 0x41
+#define BLACK_KNIGHT 0x51
+#define BLACK_PAWN 0x61
+#define EMPTY 0x00
 
-#define TEAM_WHITE 0
-#define TEAM_BLACK 1
+#define KING 0x10
+#define QUEEN 0x20
+#define ROOK 0x30
+#define BISHOP 0x40
+#define KNIGHT 0x50
+#define PAWN 0x60
+
+#define TEAM_WHITE 0x02
+#define TEAM_BLACK 0x01
 
 #define BLACK_TILE 1
 #define WHITE_TILE 2
 #define SELECTED_TILE 3
+#define POSSIBILITY 4
+
+#define MVT_MUST_EAT 0
+#define MVT_CAN_EAT 1
+#define MVT_CANT_EAT 2
 
 typedef struct position plg_pos;
 struct position {
@@ -38,10 +50,11 @@ struct playground {
   char table[8][8];
   char turn;
   plg_pos selection;
+  plg_possibilities possibilities;
 };
 plg_playground plg_new();
 void plg_draw(plg_playground *);
-plg_possibilities *plg_possibilities_get_at(plg_playground *, plg_pos);
+void plg_possibilities_get_at(plg_playground *);
 void plg_select(plg_playground *, plg_pos);
 void plg_possibilities_free(plg_possibilities *);
 

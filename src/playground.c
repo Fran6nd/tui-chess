@@ -46,6 +46,7 @@ plg_playground plg_new() {
   pl.table[5][7] = BLACK_BISHOP;
   pl.table[6][7] = BLACK_KNIGHT;
   pl.table[7][7] = BLACK_ROOK;
+  pl.possibilities.size = 0;
 
   pl.turn = TEAM_WHITE;
   plg_pos p = {
@@ -89,6 +90,14 @@ static const char *plg_get_symbol(char id) {
   }
 }
 
+char plg_get_team(char id) {
+  if (id & TEAM_WHITE)
+    return TEAM_WHITE;
+  if (id & TEAM_BLACK)
+    return TEAM_BLACK;
+  return EMPTY;
+}
+
 void plg_draw(plg_playground *plg) {
   int x, y;
   move(LINES / 2 - 4 - 2, COLS / 2 - 4 * 3);
@@ -104,6 +113,17 @@ void plg_draw(plg_playground *plg) {
       } else {
         color = BLACK_TILE;
       }
+      int i;
+      if (plg->possibilities.size > 0) {
+
+        for (i = 0; i < plg->possibilities.size; i++) {
+          if (x == plg->possibilities.list[i].x &&
+              y == plg->possibilities.list[i].y) {
+            color = POSSIBILITY;
+            break;
+          }
+        }
+      }
       attron(COLOR_PAIR(color));
       printw(" ");
       printw(plg_get_symbol(plg->table[x][y]));
@@ -117,28 +137,92 @@ plg_possibilities *plg_possibilities_new() {
   plg_possibilities *possibilities =
       (plg_possibilities *)malloc(sizeof(plg_possibilities));
   possibilities->size = 0;
+  possibilities->list = NULL;
   return possibilities;
 }
 
-void plg_possibilities_add(plg_possibilities *possibilities, plg_pos p) {
+int plg_position_is_valid(plg_playground *plg, char team, plg_pos target,
+                          int mvt) {
+  if (target.x >= 0 && target.y >= 0 && target.x < 8 && target.y < 8) {
+    switch (mvt) {
+    case MVT_CAN_EAT:
+      if ((team & 0x0F != plg->table[target.x][target.y] & 0x0) ||
+          (plg->table[target.x][target.y] == EMPTY)) {
+        return 1;
+      }
+      break;
+    case MVT_MUST_EAT:
+      if ((team & 0x0F != plg->table[target.x][target.y] & 0x0) &&
+          (plg->table[target.x][target.y] != EMPTY)) {
+        return 1;
+      }
+      break;
+    case MVT_CANT_EAT:
+      if ((plg->table[target.x][target.y] == EMPTY)) {
+        return 1;
+      }
+      break;
+    default:
+      break;
+    }
+  }
+  return 0;
+}
+
+int plg_possibilities_add(plg_playground *plg, plg_possibilities *possibilities,
+                          int x, int y, int mvt) {
+  plg_pos p = {
+      .x = x,
+      .y = y,
+  };
+  p.x += plg->selection.x;
+  p.y += plg->selection.y;
+  if (!plg_position_is_valid(
+          plg, plg->table[plg->selection.x][plg->selection.y] & 0xF, p, mvt))
+    return 0;
   possibilities->size++;
-  if (possibilities->size == 0) {
-    possibilities->list = (plg_pos *)malloc(sizeof(plg_pos));
+  if (possibilities->size == 1) {
+    possibilities->list = malloc(sizeof(plg_pos));
 
   } else {
     possibilities->list = (plg_pos *)realloc(
         possibilities->list, possibilities->size * sizeof(plg_pos));
   }
+  possibilities->list[possibilities->size - 1] = p;
+  return 1;
 }
 
-plg_possibilities *plg_possibilities_get_at(plg_playground *plg, plg_pos p) {
-  plg_possibilities *possibilities = plg_possibilities_new();
+void plg_possibilities_get_at(plg_playground *plg) {
+  if (plg->selection.x != -1 && plg->selection.y != -1) {
+    switch (plg->table[plg->selection.x][plg->selection.y] & 0xF0) {
+    case PAWN: {
+      if (plg_possibilities_add(plg, &plg->possibilities, 0, 1, MVT_CANT_EAT))
+        plg_possibilities_add(plg, &plg->possibilities, 0, 2, MVT_CANT_EAT);
+    } break;
+
+    default:
+      break;
+    }
+  }
 }
 void plg_possibilities_free(plg_possibilities *possibilities) {
-  free(possibilities->list);
-  free(possibilities);
+  if (possibilities->size > 0)
+    free(possibilities->list);
+  possibilities->size = 0;
 }
 
-void plg_select(plg_playground * plg, plg_pos p){
-    plg->selection = p;
+void plg_select(plg_playground *plg, plg_pos p) {
+  plg_possibilities_free(&plg->possibilities);
+  if (p.x >= 0 && p.y >= 0 && p.x < 8 && p.y < 8) {
+    if (plg_get_team(plg->table[p.x][p.y]) == plg->turn) {
+      plg->selection = p;
+
+      plg_possibilities_get_at(plg);
+      int i;
+
+      return;
+    }
+  }
+  plg->selection.x = -1;
+  plg->selection.y = -1;
 }
