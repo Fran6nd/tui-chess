@@ -155,7 +155,7 @@ int plg_position_is_valid(plg_playground *plg, char team, plg_pos target,
 
       break;
     case MVT_MUST_EAT:
-      if ((team & 0x0F != plg->table[target.x][target.y] & 0x0F) &&
+      if ((team != plg_get_team(plg->table[target.x][target.y])) &&
           (plg->table[target.x][target.y] != EMPTY)) {
         return 2;
       }
@@ -275,7 +275,9 @@ void plg_possibilities_get_at(plg_playground *plg) {
   if (plg->selection.x != -1 && plg->selection.y != -1) {
     switch (plg->table[plg->selection.x][plg->selection.y] & 0xF0) {
     case PAWN: {
-      if (plg_possibilities_add(plg, &plg->possibilities, 0, 1, MVT_CANT_EAT))
+      if (plg_possibilities_add(plg, &plg->possibilities, 0, 1, MVT_CANT_EAT) ==
+              1 &&
+          plg->selection.y == (plg->turn == TEAM_WHITE ? 1 : 6))
         plg_possibilities_add(plg, &plg->possibilities, 0, 2, MVT_CANT_EAT);
       plg_possibilities_add(plg, &plg->possibilities, 1, 1, MVT_MUST_EAT);
       plg_possibilities_add(plg, &plg->possibilities, -1, 1, MVT_MUST_EAT);
@@ -342,5 +344,9 @@ void plg_move(plg_playground *plg, plg_pos from, plg_pos to) {
   plg_possibilities_free(&plg->possibilities);
   plg->table[to.x][to.y] = plg->table[from.x][from.y];
   plg->table[from.x][from.y] = EMPTY;
+  if (to.y == ((plg->turn == TEAM_WHITE) ? 7 : 0) && (plg->table[to.x][to.y] & PAWN) == PAWN) {
+    plg->table[to.x][to.y] =
+        ((plg->turn == TEAM_WHITE) ? WHITE_QUEEN : BLACK_QUEEN);
+  }
   plg->turn = plg->turn == TEAM_BLACK ? TEAM_WHITE : TEAM_BLACK;
 }
