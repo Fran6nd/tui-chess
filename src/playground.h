@@ -30,9 +30,9 @@
 #define SELECTED_TILE 3
 #define POSSIBILITY 4
 
-#define MVT_MUST_EAT 0
-#define MVT_CAN_EAT 1
-#define MVT_CANT_EAT 2
+#define MVT_MUST_EAT 0x00
+#define MVT_CAN_EAT 0x01
+#define MVT_CANT_EAT 0x02
 
 typedef struct position plg_pos;
 struct position {

@@ -146,13 +146,13 @@ int plg_position_is_valid(plg_playground *plg, char team, plg_pos target,
   if (target.x >= 0 && target.y >= 0 && target.x < 8 && target.y < 8) {
     switch (mvt) {
     case MVT_CAN_EAT:
-      if ((team & 0x0F != plg->table[target.x][target.y] & 0x0) ||
+      if ((team != plg_get_team(plg->table[target.x][target.y])) ||
           (plg->table[target.x][target.y] == EMPTY)) {
         return 1;
       }
       break;
     case MVT_MUST_EAT:
-      if ((team & 0x0F != plg->table[target.x][target.y] & 0x0) &&
+      if ((team & 0x0F != plg->table[target.x][target.y] & 0x0F) &&
           (plg->table[target.x][target.y] != EMPTY)) {
         return 1;
       }
@@ -178,7 +178,7 @@ int plg_possibilities_add(plg_playground *plg, plg_possibilities *possibilities,
   p.x += plg->selection.x;
   p.y += plg->selection.y;
   if (!plg_position_is_valid(
-          plg, plg->table[plg->selection.x][plg->selection.y] & 0xF, p, mvt))
+          plg, plg_get_team(plg->table[plg->selection.x][plg->selection.y]), p, mvt))
     return 0;
   possibilities->size++;
   if (possibilities->size == 1) {
@@ -190,6 +190,39 @@ int plg_possibilities_add(plg_playground *plg, plg_possibilities *possibilities,
   }
   possibilities->list[possibilities->size - 1] = p;
   return 1;
+}
+
+void plg_possibilities_get_bishop(plg_playground *plg) {
+  {
+    int x = 1, y = 1;
+    for (y = 1; y < 8; y++) {
+      if (!plg_possibilities_add(plg, &plg->possibilities, x, y, MVT_CAN_EAT)) {
+        break;
+      }
+      x++;
+    }
+    x = 1;
+    for (y = -1; y > -8; y--) {
+      if (!plg_possibilities_add(plg, &plg->possibilities, x, y, MVT_CAN_EAT)) {
+        break;
+      }
+      x++;
+    }
+    y = 1;
+    for (x = -1; x > -8; x--) {
+      if (!plg_possibilities_add(plg, &plg->possibilities, x, y, MVT_CAN_EAT)) {
+        break;
+      }
+      y++;
+    }
+    y = -1;
+    for (x = -1; x > -8; x--) {
+      if (!plg_possibilities_add(plg, &plg->possibilities, x, y, MVT_CAN_EAT)) {
+        break;
+      }
+      y--;
+    }
+  }
 }
 
 void plg_possibilities_get_at(plg_playground *plg) {
@@ -220,6 +253,9 @@ void plg_possibilities_get_at(plg_playground *plg) {
       plg_possibilities_add(plg, &plg->possibilities, 1, 0, MVT_CAN_EAT);
       plg_possibilities_add(plg, &plg->possibilities, 0, -1, MVT_CAN_EAT);
       plg_possibilities_add(plg, &plg->possibilities, -1, 0, MVT_CAN_EAT);
+      break;
+    case BISHOP:
+      plg_possibilities_get_bishop(plg);
       break;
 
     default:
