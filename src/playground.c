@@ -104,6 +104,7 @@ void plg_draw(plg_playground *plg) {
   printw(plg->turn == TEAM_WHITE ? "TEAM WHITE      " : "TEAM BLACK      ");
   for (y = 0; y < 8; y++) {
     move(LINES / 2 - 4 + y, COLS / 2 - 4 * 3);
+    // move(LINES / 2 + 4 - y, COLS / 2 - 4 * 3);
     for (x = 0; x < 8; x++) {
       char color;
       if (y == plg->selection.y && x == plg->selection.x) {
@@ -174,6 +175,10 @@ int plg_position_is_valid(plg_playground *plg, char team, plg_pos target,
 
 int plg_possibilities_add(plg_playground *plg, plg_possibilities *possibilities,
                           int x, int y, int mvt) {
+  if (plg->turn == TEAM_BLACK) {
+    x = -x;
+    y = -y;
+  }
   plg_pos p = {
       .x = x,
       .y = y,
@@ -337,4 +342,5 @@ void plg_move(plg_playground *plg, plg_pos from, plg_pos to) {
   plg_possibilities_free(&plg->possibilities);
   plg->table[to.x][to.y] = plg->table[from.x][from.y];
   plg->table[from.x][from.y] = EMPTY;
+  plg->turn = plg->turn == TEAM_BLACK ? TEAM_WHITE : TEAM_BLACK;
 }
