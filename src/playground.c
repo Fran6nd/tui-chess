@@ -201,15 +201,27 @@ void plg_possibilities_get_rook(plg_playground *plg) {
   int x = 0, y = 0;
   int i;
   for (i = x + 1; i < 8; i++) {
-    if (!plg_possibilities_add(plg, &plg->possibilities, x + i, y,
-                               MVT_CAN_EAT)) {
+    if (plg_possibilities_add(plg, &plg->possibilities, x + i, y,
+                              MVT_CAN_EAT) != 1) {
       break;
     }
-    for (i = x - 1; i > -8; i--) {
-      if (!plg_possibilities_add(plg, &plg->possibilities, x + i, y,
-                                 MVT_CAN_EAT)) {
-        break;
-      }
+  }
+  for (i = x - 1; i > -8; i--) {
+    if (!plg_possibilities_add(plg, &plg->possibilities, x + i, y,
+                               MVT_CAN_EAT) != 1) {
+      break;
+    }
+  }
+  for (i = y - 1; i > -8; i--) {
+    if (!plg_possibilities_add(plg, &plg->possibilities, x, y + i,
+                               MVT_CAN_EAT) != 1) {
+      break;
+    }
+  }
+  for (i = y + 1; i < 8; i++) {
+    if (plg_possibilities_add(plg, &plg->possibilities, x, y + i,
+                              MVT_CAN_EAT) != 1) {
+      break;
     }
   }
 }
@@ -286,7 +298,13 @@ void plg_possibilities_get_at(plg_playground *plg) {
     case BISHOP:
       plg_possibilities_get_bishop(plg);
       break;
-
+    case ROOK:
+      plg_possibilities_get_rook(plg);
+      break;
+    case QUEEN:
+      plg_possibilities_get_rook(plg);
+      plg_possibilities_get_bishop(plg);
+      break;
     default:
       break;
     }
