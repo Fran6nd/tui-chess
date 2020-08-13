@@ -81,7 +81,7 @@ plg_playground plg_new() {
 }
 
 static const char *plg_get_symbol(int id) {
-    switch (id) {
+    switch (id & 0x0FF) {
     case WHITE_KING:
         return "\xe2\x99\x94";
     case WHITE_QUEEN:
@@ -336,7 +336,7 @@ void plg_possibilities_get_bishop(plg_playground *plg, int nested) {
 
 void plg_possibilities_get_at(plg_playground *plg, int nested) {
     if (plg->selection.x != -1 && plg->selection.y != -1) {
-        switch (plg->table[plg->selection.x][plg->selection.y] & 0xF0) {
+        switch (plg->table[plg->selection.x][plg->selection.y] & 0x0F0) {
         case PAWN: {
             if (plg_possibilities_add(plg, &plg->possibilities, 0, 1, MVT_CANT_EAT, nested) ==
                 1 &&
@@ -409,5 +409,6 @@ void plg_move(plg_playground *plg, plg_pos from, plg_pos to) {
         plg->table[to.x][to.y] =
             ((plg->turn == TEAM_WHITE) ? WHITE_QUEEN : BLACK_QUEEN);
     }
+    plg->table[to.x][to.y] |= HAS_MOVED;
     plg->turn = plg->turn == TEAM_BLACK ? TEAM_WHITE : TEAM_BLACK;
 }
