@@ -7,7 +7,7 @@ void plg_flip_map(plg_playground *plg) {
     for (y = 0; y < 4; y++) {
         for (x = 0; x < 8; x++) {
             int y_bis = 7 - y;
-            char tmp = plg->table[x][y];
+            int tmp = plg->table[x][y];
             plg->table[x][y] = plg->table[x][y_bis];
             plg->table[x][y_bis] = tmp;
         }
@@ -15,7 +15,7 @@ void plg_flip_map(plg_playground *plg) {
     for (y = 0; y < 8; y++) {
         for (x = 0; x < 4; x++) {
             int x_bis = 7 - x;
-            char tmp = plg->table[x][y];
+            int tmp = plg->table[x][y];
             plg->table[x][y] = plg->table[x_bis][y];
             plg->table[x_bis][y] = tmp;
         }
@@ -80,7 +80,7 @@ plg_playground plg_new() {
     return pl;
 }
 
-static const char *plg_get_symbol(char id) {
+static const char *plg_get_symbol(int id) {
     switch (id) {
     case WHITE_KING:
         return "\xe2\x99\x94";
@@ -113,7 +113,7 @@ static const char *plg_get_symbol(char id) {
     }
 }
 
-char plg_get_team(char id) {
+int plg_get_team(int id) {
     if (id & TEAM_WHITE)
         return TEAM_WHITE;
     if (id & TEAM_BLACK)
@@ -121,7 +121,7 @@ char plg_get_team(char id) {
     return EMPTY;
 }
 
-static char plg_get_ennemy_team(char id) {
+static int plg_get_ennemy_team(int id) {
     id = plg_get_team(id);
     return id == TEAM_BLACK ? TEAM_WHITE : TEAM_BLACK;
 }
@@ -134,7 +134,7 @@ void plg_draw(plg_playground *plg) {
         move(LINES / 2 - 4 + y, COLS / 2 - 4 * 3);
         // move(LINES / 2 + 4 - y, COLS / 2 - 4 * 3);
         for (x = 0; x < 8; x++) {
-            char color;
+            int color;
             if (y == plg->selection.y && x == plg->selection.x) {
                 color = SELECTED_TILE;
             }
@@ -165,7 +165,7 @@ void plg_draw(plg_playground *plg) {
 }
 
 /* return 0: no move, 1 move on emty, 2 move & eat. */
-int plg_position_is_valid(plg_playground *plg, char team, plg_pos target,
+int plg_position_is_valid(plg_playground *plg, int team, plg_pos target,
     int mvt) {
     if (target.x >= 0 && target.y >= 0 && target.x < 8 && target.y < 8) {
         switch (mvt) {

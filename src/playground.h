@@ -1,29 +1,32 @@
 #ifndef PLAYGROUND_H
 #define PLAYGROUND_H
 
-#define WHITE_KING 0x12
-#define WHITE_QUEEN 0x22
-#define WHITE_ROOK 0x32
-#define WHITE_BISHOP 0x42
-#define WHITE_KNIGHT 0x52
-#define WHITE_PAWN 0x62
-#define BLACK_KING 0x11
-#define BLACK_QUEEN 0x21
-#define BLACK_ROOK 0x31
-#define BLACK_BISHOP 0x41
-#define BLACK_KNIGHT 0x51
-#define BLACK_PAWN 0x61
-#define EMPTY 0x00
+#define WHITE_KING 0x212
+#define WHITE_QUEEN 0x222
+#define WHITE_ROOK 0x232
+#define WHITE_BISHOP 0x242
+#define WHITE_KNIGHT 0x252
+#define WHITE_PAWN 0x262
+#define BLACK_KING 0x211
+#define BLACK_QUEEN 0x221
+#define BLACK_ROOK 0x231
+#define BLACK_BISHOP 0x241
+#define BLACK_KNIGHT 0x251
+#define BLACK_PAWN 0x261
+#define EMPTY 0x000
 
-#define KING 0x10
-#define QUEEN 0x20
-#define ROOK 0x30
-#define BISHOP 0x40
-#define KNIGHT 0x50
-#define PAWN 0x60
+#define KING 0x010
+#define QUEEN 0x020
+#define ROOK 0x030
+#define BISHOP 0x040
+#define KNIGHT 0x050
+#define PAWN 0x060
 
-#define TEAM_WHITE 0x02
-#define TEAM_BLACK 0x01
+#define HAS_MOVED 0x100
+#define HAS_NOT_MOVED 0x200
+
+#define TEAM_WHITE 0x002
+#define TEAM_BLACK 0x001
 
 #define BLACK_TILE 1
 #define WHITE_TILE 2
@@ -47,11 +50,11 @@ struct possibilities {
 
 typedef struct playground plg_playground;
 struct playground {
-  char table[8][8];
-  char turn;
+  int table[8][8];
+  int turn;
   plg_pos selection;
   plg_possibilities possibilities;
-  char top_team;
+  int top_team;
 };
 plg_playground plg_new();
 void plg_draw(plg_playground *);
