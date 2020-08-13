@@ -12,6 +12,14 @@ void plg_flip_map(plg_playground *plg) {
       plg->table[x][y_bis] = tmp;
     }
   }
+  for (y = 0; y < 8; y++) {
+    for (x = 0; x < 4; x++) {
+      int x_bis = 7 - x;
+      char tmp = plg->table[x][y];
+      plg->table[x][y] = plg->table[x_bis][y];
+      plg->table[x_bis][y] = tmp;
+    }
+  }
   plg->top_team = plg->top_team == TEAM_WHITE ? TEAM_BLACK : TEAM_WHITE;
 }
 
