@@ -121,6 +121,11 @@ char plg_get_team(char id) {
   return EMPTY;
 }
 
+static char plg_get_ennemy_team(char id){
+  id = plg_get_team(id);
+  return id == TEAM_BLACK ? TEAM_WHITE : TEAM_BLACK;
+}
+
 void plg_draw(plg_playground *plg) {
   int x, y;
   move(LINES / 2 - 4 - 2, COLS / 2 - 4 * 3);
@@ -235,13 +240,13 @@ void plg_possibilities_get_rook(plg_playground *plg) {
     }
   }
   for (i = x - 1; i > -8; i--) {
-    if (!plg_possibilities_add(plg, &plg->possibilities, x + i, y,
+    if (plg_possibilities_add(plg, &plg->possibilities, x + i, y,
                                MVT_CAN_EAT) != 1) {
       break;
     }
   }
   for (i = y - 1; i > -8; i--) {
-    if (!plg_possibilities_add(plg, &plg->possibilities, x, y + i,
+    if (plg_possibilities_add(plg, &plg->possibilities, x, y + i,
                                MVT_CAN_EAT) != 1) {
       break;
     }
