@@ -13,17 +13,19 @@
 #define BLACK_BISHOP 0x41
 #define BLACK_KNIGHT 0x51
 #define BLACK_PAWN 0x61
-#define EMPTY 0x00
+#define EMPTY 0x000
 
-#define KING 0x10
-#define QUEEN 0x20
-#define ROOK 0x30
-#define BISHOP 0x40
-#define KNIGHT 0x50
-#define PAWN 0x60
+#define KING 0x010
+#define QUEEN 0x020
+#define ROOK 0x030
+#define BISHOP 0x040
+#define KNIGHT 0x050
+#define PAWN 0x060
 
-#define TEAM_WHITE 0x02
-#define TEAM_BLACK 0x01
+#define HAS_MOVED 0x100
+
+#define TEAM_WHITE 0x002
+#define TEAM_BLACK 0x001
 
 #define BLACK_TILE 1
 #define WHITE_TILE 2
@@ -47,15 +49,15 @@ struct possibilities {
 
 typedef struct playground plg_playground;
 struct playground {
-  char table[8][8];
-  char turn;
+  int table[8][8];
+  int turn;
   plg_pos selection;
   plg_possibilities possibilities;
-  char top_team;
+  int top_team;
 };
 plg_playground plg_new();
 void plg_draw(plg_playground *);
-void plg_possibilities_get_at(plg_playground *);
+void plg_possibilities_get_at(plg_playground *, int);
 void plg_select(plg_playground *, plg_pos);
 void plg_possibilities_free(plg_possibilities *);
 void plg_move(plg_playground * plg, plg_pos from, plg_pos to);
