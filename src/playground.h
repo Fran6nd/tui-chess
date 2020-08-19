@@ -7,11 +7,12 @@
 #define POSSIBILITY 4
 
 #include "position.h"
+#include "movement.h"
 
-typedef struct possibilities positionsibilities;
+typedef struct possibilities possibilities;
 struct possibilities {
   int size;
-  position *list;
+  movement **list;
 };
 
 typedef struct playground plg_playground;
@@ -19,14 +20,20 @@ struct playground {
   int table[8][8];
   int turn;
   position selection;
-  positionsibilities possibilities;
+  possibilities possibilities;
   int top_team;
 };
 plg_playground plg_new();
 void plg_draw(plg_playground *);
 void positionsibilities_get_at(plg_playground *, int);
 void plg_select(plg_playground *, position);
-void positionsibilities_free(positionsibilities *);
+void possibilities_free(possibilities *);
 void plg_move(plg_playground * plg, position from, position to);
+
+
+movement * mov_new(plg_playground * plg, position pos_start, position pos_end, char type);
+/* For rocking. */
+movement * mov_new_complicated(plg_playground * plg, position pos_start, position pos_end,position pos_start_2,position pos_end_2);
+void mov_free(movement * mv);
 
 #endif

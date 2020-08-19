@@ -46,8 +46,8 @@ int main(int argc, char *argv[]) {
                 position tmp = {.x = j / 3, .y = event.y - (LINES / 2 - 4)};
                 int done = 0;
                 for (i = 0; i < plg.possibilities.size; i++) {
-                  if (plg.possibilities.list[i].x == tmp.x &&
-                      plg.possibilities.list[i].y == tmp.y) {
+                  if (plg.possibilities.list[i]->pos_end.x == tmp.x &&
+                      plg.possibilities.list[i]->pos_end.y == tmp.y) {
                     done = 1;
                     plg_move(&plg, plg.selection, tmp);
                   }
