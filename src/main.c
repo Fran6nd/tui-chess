@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
                 for (i = event.x - 2; i > COLS / 2 - 4 * 3; i -= 3) {
                   j += 3;
                 }
-                plg_pos tmp = {.x = j / 3, .y = event.y - (LINES / 2 - 4)};
+                position tmp = {.x = j / 3, .y = event.y - (LINES / 2 - 4)};
                 int done = 0;
                 for (i = 0; i < plg.possibilities.size; i++) {
                   if (plg.possibilities.list[i].x == tmp.x &&
