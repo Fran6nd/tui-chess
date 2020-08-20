@@ -197,6 +197,22 @@ int positionsibilities_add(plg_playground *plg, possibilities *possibilities,
     return ret;
 }
 
+int possibilities_add_nocheck(plg_playground *plg, movement *mov)
+{
+    (&plg->possibilities)->size++;
+    if ((&plg->possibilities)->size == 1)
+    {
+        (&plg->possibilities)->list = malloc(sizeof(movement *));
+    }
+    else
+    {
+        (&plg->possibilities)->list = (movement **)realloc(
+            (&plg->possibilities)->list, (&plg->possibilities)->size * sizeof(movement *));
+    }
+    (&plg->possibilities)->list[(&plg->possibilities)->size - 1] = mov;
+    return 1;
+}
+
 void positionsibilities_get_rook(plg_playground *plg, position from, int nested)
 {
     int x = 0, y = 0;
@@ -300,7 +316,7 @@ void possibilities_get(plg_playground *plg, int nested)
                     case PAWN:
                     {
                         int ret = positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, 1), MVT_CANT_EAT, nested);
-                        if ((ret == 1  || ret == -1) &&
+                        if ((ret == 1 || ret == -1) &&
                             has_moved(plg->table[x][y]) == 0)
                             positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, 2), MVT_CANT_EAT, nested);
                         positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, 1), MVT_MUST_EAT, nested);
@@ -326,6 +342,51 @@ void possibilities_get(plg_playground *plg, int nested)
                         positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, 0), MVT_CAN_EAT, nested);
                         positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, -1), MVT_CAN_EAT, nested);
                         positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, 0), MVT_CAN_EAT, nested);
+                        /* RocK */
+                        if (!has_moved(plg->table[x][y]))
+                        {
+                            int x1;
+                            if (plg->table[0][y] == (ROOK | plg->turn))
+                            {
+                                if (!has_moved(plg->table[0][y]))
+                                {
+                                    int empty = 1;
+                                    for (x1 = 1; x1 < x; x1++)
+                                    {
+                                        if (plg->table[x1][y] != EMPTY)
+                                        {
+                                            empty = 0;
+                                            break;
+                                        }
+                                    }
+                                    if (empty)
+                                    {
+                                        movement *mov = mov_new_complicated(plg, pos_new(x, y), pos_new(x - 2, y), pos_new(0, y), pos_new(x - 1, y));
+                                        possibilities_add_nocheck(plg, mov);
+                                    }
+                                }
+                            }
+                            if (plg->table[7][y] == (ROOK | plg->turn))
+                            {
+                                if (!has_moved(plg->table[7][y]))
+                                {
+                                    int empty = 1;
+                                    for (x1 = x+1; x1 < 7; x1++)
+                                    {
+                                        if (plg->table[x1][y] != EMPTY)
+                                        {
+                                            empty = 0;
+                                            break;
+                                        }
+                                    }
+                                    if (empty)
+                                    {
+                                        movement *mov = mov_new_complicated(plg, pos_new(x, y), pos_new(x - 2, y), pos_new(0, y), pos_new(x - 1, y));
+                                        possibilities_add_nocheck(plg, mov);
+                                    }
+                                }
+                            }
+                        }
                         break;
                     case BISHOP:
                         positionsibilities_get_bishop(plg, from, nested);
