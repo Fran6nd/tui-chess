@@ -145,6 +145,7 @@ int plg_check_chess(plg_playground *plg)
     return 0;
 }
 
+/* RETURN -1 if cannot move because of chess, 0 if can't move, 1 if move on empty and 2 if move and eat. */
 int positionsibilities_add(plg_playground *plg, possibilities *possibilities,
                            position from,
                            position delta, int mvt, int nested)
@@ -176,7 +177,7 @@ int positionsibilities_add(plg_playground *plg, possibilities *possibilities,
             if ((plg_tmp.table[tmp.x][tmp.y] & KING) == KING)
             {
                 possibilities_free(&plg_tmp.possibilities);
-                return 0;
+                return -1;
             }
         }
         possibilities_free(&plg_tmp.possibilities);
@@ -298,8 +299,8 @@ void possibilities_get(plg_playground *plg, int nested)
                     {
                     case PAWN:
                     {
-                        if (positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, 1), MVT_CANT_EAT, nested) ==
-                                1 &&
+                        int ret = positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, 1), MVT_CANT_EAT, nested);
+                        if ((ret == 1  || ret == -1) &&
                             has_moved(plg->table[x][y]) == 0)
                             positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, 2), MVT_CANT_EAT, nested);
                         positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, 1), MVT_MUST_EAT, nested);
