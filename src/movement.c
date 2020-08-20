@@ -16,6 +16,7 @@ movement * mov_new(plg_playground * plg, position pos_start, position pos_end, c
     m->piece_eaten = plg->table[pos_end.x][pos_end.y];
     m->dependancy = NULL;
     m->type = type;
+    m->has_dependancy = 0;
     return m;
 }
 /* For rocking. */
@@ -23,12 +24,13 @@ movement * mov_new_complicated(plg_playground * plg, position pos_start, positio
     movement * m;
     m = mov_new(plg, pos_start, pos_end, MVT_CANT_EAT);
     m->dependancy = mov_new(plg, pos_start_2, pos_end_2, MVT_CANT_EAT);
+    m->has_dependancy = 1;
     return m;
 }
 void mov_free(movement * mv)
 {
     if(mv != NULL){
-        if(mv->dependancy != NULL){
+        if(mv->has_dependancy){
             mov_free(mv->dependancy);
         }
         free(mv);

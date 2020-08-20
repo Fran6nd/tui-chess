@@ -160,6 +160,9 @@ int main(int argc, char *argv[])
                         plg.possibilities.list[i]->pos_start.x == selection.x)
                     {
                       plg_move(&plg, selection, tmp);
+                      if(plg.possibilities.list[i]->has_dependancy){
+                        plg_move(&plg, plg.possibilities.list[i]->dependancy->pos_start, plg.possibilities.list[i]->dependancy->pos_end);
+                      }
                       break;
                     }
                   }

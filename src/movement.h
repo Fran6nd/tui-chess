@@ -14,6 +14,7 @@ struct movement {
     char type;
     int piece_moving;
     int piece_eaten;
+    int has_dependancy;
     movement * dependancy;
 };
 
