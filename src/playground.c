@@ -163,7 +163,25 @@ int positionsibilities_add(plg_playground *plg, possibilities *possibilities,
         mvt);
     if (ret == 0)
         return 0;
-
+    if (nested == 0)
+    {
+        plg_playground plg_tmp = *plg;
+        plg_tmp.possibilities.size = 0;
+        plg_move(&plg_tmp, from, p);
+        possibilities_get(&plg_tmp, 1);
+        int i;
+        for (i = 0; i < plg_tmp.possibilities.size; i++)
+        {
+            position tmp = plg_tmp.possibilities.list[i]->pos_end;
+            if ((plg_tmp.table[tmp.x][tmp.y] & KING) == KING)
+            {
+                possibilities_free(&plg_tmp.possibilities);
+                return 0;
+            }
+        }
+        possibilities_free(&plg_tmp.possibilities);
+    }
+    movement *mov = mov_new(plg, from, p, mvt);
     possibilities->size++;
     if (possibilities->size == 1)
     {
@@ -174,7 +192,7 @@ int positionsibilities_add(plg_playground *plg, possibilities *possibilities,
         possibilities->list = (movement **)realloc(
             possibilities->list, possibilities->size * sizeof(movement *));
     }
-    possibilities->list[possibilities->size - 1] = mov_new(plg, from, p, mvt);
+    possibilities->list[possibilities->size - 1] = mov;
     return ret;
 }
 
