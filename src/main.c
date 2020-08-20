@@ -150,20 +150,19 @@ int main(int argc, char *argv[])
                   selection.null = 0;
                   possibilities_get(&plg, 0);
                 }
-                else
+                else if(!selection.null)
                 {
-                  int done = 0;
                   for (i = 0; i < plg.possibilities.size; i++)
                   {
                     if (plg.possibilities.list[i]->pos_end.x == tmp.x &&
-                        plg.possibilities.list[i]->pos_end.y == tmp.y)
+                        plg.possibilities.list[i]->pos_end.y == tmp.y &&
+                        plg.possibilities.list[i]->pos_start.y == selection.y &&
+                        plg.possibilities.list[i]->pos_start.x == selection.x)
                     {
-                      done = 1;
                       plg_move(&plg, selection, tmp);
                       break;
                     }
                   }
-                  if (!done)
                     selection.null = 1;
                 }
               }

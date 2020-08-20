@@ -85,18 +85,9 @@ plg_playground plg_new()
     return pl;
 }
 
-int plg_get_team(int id)
-{
-    if (id & TEAM_WHITE)
-        return TEAM_WHITE;
-    if (id & TEAM_BLACK)
-        return TEAM_BLACK;
-    return EMPTY;
-}
-
 static int plg_get_ennemy_team(int id)
 {
-    id = plg_get_team(id);
+    id = get_team(id);
     return id == TEAM_BLACK ? TEAM_WHITE : TEAM_BLACK;
 }
 
@@ -113,14 +104,14 @@ int positionition_is_valid(plg_playground *plg, int team, position target,
             {
                 return 1;
             }
-            else if (team != plg_get_team(plg->table[target.x][target.y]))
+            else if (team != get_team(plg->table[target.x][target.y]))
             {
                 return 2;
             }
 
             break;
         case MVT_MUST_EAT:
-            if ((team != plg_get_team(plg->table[target.x][target.y])) &&
+            if ((team != get_team(plg->table[target.x][target.y])) &&
                 (plg->table[target.x][target.y] != EMPTY))
             {
                 return 2;
@@ -168,24 +159,10 @@ int positionsibilities_add(plg_playground *plg, possibilities *possibilities,
         .y = delta.y + from.y,
     };
     int ret = positionition_is_valid(
-        plg, plg_get_team(plg->table[p.x][p.y]), p,
+        plg, get_team(plg->table[from.x][from.y]), p,
         mvt);
-    if (!ret)
+    if (ret == 0)
         return 0;
-        /*
-    if (!nested)
-    {
-        plg_playground plg_tmp = *plg;
-        plg_tmp.possibilities.size = 0;
-        plg_tmp.turn = plg->turn;
-        plg_tmp.top_team = plg->top_team;
-
-        plg_move(&plg_tmp, plg->selection, p);
-        if (plg_check_chess(&plg_tmp) == 1)
-        {
-            return 0;
-        }
-    }*/
 
     possibilities->size++;
     if (possibilities->size == 1)
