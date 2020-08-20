@@ -19,14 +19,11 @@ typedef struct playground plg_playground;
 struct playground {
   int table[8][8];
   int turn;
-  position selection;
   possibilities possibilities;
   int top_team;
 };
 plg_playground plg_new();
-void plg_draw(plg_playground *);
-void positionsibilities_get_at(plg_playground *, int);
-void plg_select(plg_playground *, position);
+void possibilities_get(plg_playground *, int);
 void possibilities_free(possibilities *);
 void plg_move(plg_playground * plg, position from, position to);
 
