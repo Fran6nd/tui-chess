@@ -20,7 +20,7 @@ piece.o:
 movement.o:
 	gcc -g -c src/movement.c -o src/movement.o
 tui-chess: main.o playground.o position.o movement.o piece.o
-	gcc -g $(curses) -Isrc/ src/main.o src/playground.o src/position.o src/piece.o src/movement.o -o tui-chess
+	gcc -g src/main.o src/playground.o src/position.o src/piece.o src/movement.o $(curses) -Isrc/ -o tui-chess
 clean:
 	rm src/*.o
 	rm tui-chess
