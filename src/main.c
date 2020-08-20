@@ -2,8 +2,8 @@
 #include <ncurses.h>
 #include <stdlib.h>
 
-#include "playground.h"
 #include "piece.h"
+#include "playground.h"
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
@@ -76,8 +76,7 @@ void plg_draw(plg_playground *plg)
         for (i = 0; i < plg->possibilities.size; i++)
         {
           if (x == plg->possibilities.list[i]->pos_end.x &&
-              y == plg->possibilities.list[i]->pos_end.y &&
-              !selection.null &&
+              y == plg->possibilities.list[i]->pos_end.y && !selection.null &&
               plg->possibilities.list[i]->pos_start.y == selection.y &&
               plg->possibilities.list[i]->pos_start.x == selection.x)
           {
@@ -144,13 +143,13 @@ int main(int argc, char *argv[])
                   j += 3;
                 }
                 position tmp = {.x = j / 3, .y = event.y - (LINES / 2 - 4)};
-                if (get_team(plg.table[tmp.x][tmp.y]) == plg.turn )
+                if (get_team(plg.table[tmp.x][tmp.y]) == plg.turn)
                 {
                   selection = tmp;
                   selection.null = 0;
                   possibilities_get(&plg, 0);
                 }
-                else if(!selection.null)
+                else if (!selection.null)
                 {
                   for (i = 0; i < plg.possibilities.size; i++)
                   {
@@ -160,13 +159,18 @@ int main(int argc, char *argv[])
                         plg.possibilities.list[i]->pos_start.x == selection.x)
                     {
                       plg_move(&plg, selection, tmp);
-                      if(plg.possibilities.list[i]->has_dependancy){
-                        plg_move(&plg, plg.possibilities.list[i]->dependancy->pos_start, plg.possibilities.list[i]->dependancy->pos_end);
+                      if (plg.possibilities.list[i]->has_dependancy)
+                      {
+                        plg_move(
+                            &plg,
+                            plg.possibilities.list[i]->dependancy->pos_start,
+                            plg.possibilities.list[i]->dependancy->pos_end);
                       }
+                      possibilities_free(&plg.possibilities);
                       break;
                     }
                   }
-                    selection.null = 1;
+                  selection.null = 1;
                 }
               }
             }

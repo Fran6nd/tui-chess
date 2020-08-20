@@ -164,6 +164,7 @@ int positionsibilities_add(plg_playground *plg, possibilities *possibilities,
         mvt);
     if (ret == 0)
         return 0;
+    /* There is a bug here somehow... */
     if (nested == 0)
     {
         plg_playground plg_tmp = *plg;
@@ -174,7 +175,7 @@ int positionsibilities_add(plg_playground *plg, possibilities *possibilities,
         for (i = 0; i < plg_tmp.possibilities.size; i++)
         {
             position tmp = plg_tmp.possibilities.list[i]->pos_end;
-            if ((plg_tmp.table[tmp.x][tmp.y] & KING) == KING)
+            if ((plg_tmp.table[tmp.x][tmp.y] & (KING | plg_get_ennemy_team(plg_tmp.turn))) == (KING | plg_get_ennemy_team(plg_tmp.turn)))
             {
                 possibilities_free(&plg_tmp.possibilities);
                 return -1;
@@ -371,7 +372,7 @@ void possibilities_get(plg_playground *plg, int nested)
                                 if (!has_moved(plg->table[7][y]))
                                 {
                                     int empty = 1;
-                                    for (x1 = x+1; x1 < 7; x1++)
+                                    for (x1 = x + 1; x1 < 7; x1++)
                                     {
                                         if (plg->table[x1][y] != EMPTY)
                                         {
@@ -381,7 +382,7 @@ void possibilities_get(plg_playground *plg, int nested)
                                     }
                                     if (empty)
                                     {
-                                        movement *mov = mov_new_complicated(plg, pos_new(x, y), pos_new(x - 2, y), pos_new(0, y), pos_new(x - 1, y));
+                                        movement *mov = mov_new_complicated(plg, pos_new(x, y), pos_new(x + 2, y), pos_new(7, y), pos_new(x + 1, y));
                                         possibilities_add_nocheck(plg, mov);
                                     }
                                 }
@@ -422,7 +423,6 @@ void possibilities_free(possibilities *possibilities)
 
 void plg_move(plg_playground *plg, position from, position to)
 {
-    possibilities_free(&plg->possibilities);
     plg->table[to.x][to.y] = plg->table[from.x][from.y];
     plg->table[from.x][from.y] = EMPTY;
     if (to.y == ((plg->turn == TEAM_WHITE) ? 7 : 0) &&
