@@ -302,7 +302,7 @@ void positionsibilities_get_bishop(plg_playground *plg, position from, int neste
     }
 }
 
-void possibilities_get_at(plg_playground *plg, position from, int nested)
+void possibilities_get_at(plg_playground *plg, possibilities *p, position from, int nested)
 {
     int x = from.x;
     int y = from.y;
@@ -314,33 +314,33 @@ void possibilities_get_at(plg_playground *plg, position from, int nested)
             {
             case PAWN:
             {
-                int ret = positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, 1), MVT_CANT_EAT, nested);
+                int ret = positionsibilities_add(plg, p, from, pos_new(0, 1), MVT_CANT_EAT, nested);
                 if ((ret == 1 || ret == -1) &&
                     has_moved(plg->table[x][y]) == 0)
-                    positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, 2), MVT_CANT_EAT, nested);
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, 1), MVT_MUST_EAT, nested);
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, 1), MVT_MUST_EAT, nested);
+                    positionsibilities_add(plg, p, from, pos_new(0, 2), MVT_CANT_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(1, 1), MVT_MUST_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(-1, 1), MVT_MUST_EAT, nested);
             }
             break;
             case KNIGHT:
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(-2, 1), MVT_CAN_EAT, nested);
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(-2, -1), MVT_CAN_EAT, nested);
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(2, 1), MVT_CAN_EAT, nested);
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(2, -1), MVT_CAN_EAT, nested);
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, 2), MVT_CAN_EAT, nested);
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, 2), MVT_CAN_EAT, nested);
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, -2), MVT_CAN_EAT, nested);
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, -2), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(-2, 1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(-2, -1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(2, 1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(2, -1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(1, 2), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(-1, 2), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(1, -2), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(-1, -2), MVT_CAN_EAT, nested);
                 break;
             case KING:
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, 1), MVT_CAN_EAT, nested);
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, -1), MVT_CAN_EAT, nested);
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, -1), MVT_CAN_EAT, nested);
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, 1), MVT_CAN_EAT, nested);
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, 1), MVT_CAN_EAT, nested);
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, 0), MVT_CAN_EAT, nested);
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, -1), MVT_CAN_EAT, nested);
-                positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, 0), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(-1, 1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(-1, -1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(1, -1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(1, 1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(0, 1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(1, 0), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(0, -1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, p, from, pos_new(-1, 0), MVT_CAN_EAT, nested);
                 /* RocK */
                 if (!has_moved(plg->table[x][y]))
                 {
@@ -361,7 +361,7 @@ void possibilities_get_at(plg_playground *plg, position from, int nested)
                             if (empty)
                             {
                                 movement *mov = mov_new_complicated(plg, pos_new(x, y), pos_new(x - 2, y), pos_new(0, y), pos_new(x - 1, y));
-                                possibilities_add_nocheck(&plg->possibilities, mov);
+                                possibilities_add_nocheck(p, mov);
                             }
                         }
                     }
@@ -381,7 +381,7 @@ void possibilities_get_at(plg_playground *plg, position from, int nested)
                             if (empty)
                             {
                                 movement *mov = mov_new_complicated(plg, pos_new(x, y), pos_new(x + 2, y), pos_new(7, y), pos_new(x + 1, y));
-                                possibilities_add_nocheck(&plg->possibilities, mov);
+                                possibilities_add_nocheck(p, mov);
                             }
                         }
                     }
@@ -410,7 +410,7 @@ void possibilities_get_all(plg_playground *plg, int nested)
     {
         for (y = 0; y < 8; y++)
         {
-            possibilities_get_at(plg, pos_new(x, y), nested);
+            possibilities_get_at(plg, &plg->possibilities, pos_new(x, y), nested);
         }
     }
 }
