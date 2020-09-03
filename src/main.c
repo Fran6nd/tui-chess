@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
                 {
                   selection = tmp;
                   selection.null = 0;
-                  possibilities_get(&plg, 0);
+                  possibilities_get_all(&plg, 0);
                 }
                 else if (!selection.null)
                 {
@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
                         plg.possibilities.list[i]->pos_start.y == selection.y &&
                         plg.possibilities.list[i]->pos_start.x == selection.x)
                     {
-                      plg_move(&plg, selection, tmp);
+                      plg_move(&plg, plg.possibilities.list[i]->pos_start, plg.possibilities.list[i]->pos_end);
                       if (plg.possibilities.list[i]->has_dependancy)
                       {
                         plg_move(

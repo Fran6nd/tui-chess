@@ -138,7 +138,7 @@ int plg_check_chess(plg_playground *plg)
         for (y = 0; y < 8; y++)
         {
             possibilities_free(&plg->possibilities);
-            possibilities_get(plg, 1);
+            possibilities_get_all(plg, 1);
             possibilities_free(&plg->possibilities);
         }
     }
@@ -165,17 +165,18 @@ int positionsibilities_add(plg_playground *plg, possibilities *possibilities,
     if (ret == 0)
         return 0;
     /* There is a bug here somehow... */
-    if (nested == 0)
+    if (nested == 0 && 0)
     {
         plg_playground plg_tmp = *plg;
         plg_tmp.possibilities.size = 0;
+        plg_tmp.possibilities.list = NULL;
         plg_move(&plg_tmp, from, p);
-        possibilities_get(&plg_tmp, 1);
+        possibilities_get_all(&plg_tmp, 1);
         int i;
         for (i = 0; i < plg_tmp.possibilities.size; i++)
         {
             position tmp = plg_tmp.possibilities.list[i]->pos_end;
-            if ((plg_tmp.table[tmp.x][tmp.y] & (KING | plg_get_ennemy_team(plg_tmp.turn))) == (KING | plg_get_ennemy_team(plg_tmp.turn)))
+            if ((plg_tmp.table[tmp.x][tmp.y] & KING) == KING)
             {
                 possibilities_free(&plg_tmp.possibilities);
                 return -1;
@@ -198,19 +199,19 @@ int positionsibilities_add(plg_playground *plg, possibilities *possibilities,
     return ret;
 }
 
-int possibilities_add_nocheck(plg_playground *plg, movement *mov)
+int possibilities_add_nocheck(possibilities *p, movement *mov)
 {
-    (&plg->possibilities)->size++;
-    if ((&plg->possibilities)->size == 1)
+    p->size++;
+    if (p->size == 1)
     {
-        (&plg->possibilities)->list = malloc(sizeof(movement *));
+        p->list = malloc(sizeof(movement *));
     }
     else
     {
-        (&plg->possibilities)->list = (movement **)realloc(
-            (&plg->possibilities)->list, (&plg->possibilities)->size * sizeof(movement *));
+        p->list = (movement **)realloc(
+            p->list, p->size * sizeof(movement *));
     }
-    (&plg->possibilities)->list[(&plg->possibilities)->size - 1] = mov;
+    p->list[p->size - 1] = mov;
     return 1;
 }
 
@@ -301,109 +302,115 @@ void positionsibilities_get_bishop(plg_playground *plg, position from, int neste
     }
 }
 
-void possibilities_get(plg_playground *plg, int nested)
+void possibilities_get_at(plg_playground *plg, position from, int nested)
+{
+    int x = from.x;
+    int y = from.y;
+
+    if (get_team(plg->table[from.x][from.y]) == plg->turn)
+    {
+        {
+            switch (plg->table[from.x][from.y] & 0x0F0)
+            {
+            case PAWN:
+            {
+                int ret = positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, 1), MVT_CANT_EAT, nested);
+                if ((ret == 1 || ret == -1) &&
+                    has_moved(plg->table[x][y]) == 0)
+                    positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, 2), MVT_CANT_EAT, nested);
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, 1), MVT_MUST_EAT, nested);
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, 1), MVT_MUST_EAT, nested);
+            }
+            break;
+            case KNIGHT:
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(-2, 1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(-2, -1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(2, 1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(2, -1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, 2), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, 2), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, -2), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, -2), MVT_CAN_EAT, nested);
+                break;
+            case KING:
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, 1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, -1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, -1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, 1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, 1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, 0), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, -1), MVT_CAN_EAT, nested);
+                positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, 0), MVT_CAN_EAT, nested);
+                /* RocK */
+                if (!has_moved(plg->table[x][y]))
+                {
+                    int x1;
+                    if (plg->table[0][y] == (ROOK | plg->turn))
+                    {
+                        if (!has_moved(plg->table[0][y]))
+                        {
+                            int empty = 1;
+                            for (x1 = 1; x1 < x; x1++)
+                            {
+                                if (plg->table[x1][y] != EMPTY)
+                                {
+                                    empty = 0;
+                                    break;
+                                }
+                            }
+                            if (empty)
+                            {
+                                movement *mov = mov_new_complicated(plg, pos_new(x, y), pos_new(x - 2, y), pos_new(0, y), pos_new(x - 1, y));
+                                possibilities_add_nocheck(&plg->possibilities, mov);
+                            }
+                        }
+                    }
+                    if (plg->table[7][y] == (ROOK | plg->turn))
+                    {
+                        if (!has_moved(plg->table[7][y]))
+                        {
+                            int empty = 1;
+                            for (x1 = x + 1; x1 < 7; x1++)
+                            {
+                                if (plg->table[x1][y] != EMPTY)
+                                {
+                                    empty = 0;
+                                    break;
+                                }
+                            }
+                            if (empty)
+                            {
+                                movement *mov = mov_new_complicated(plg, pos_new(x, y), pos_new(x + 2, y), pos_new(7, y), pos_new(x + 1, y));
+                                possibilities_add_nocheck(&plg->possibilities, mov);
+                            }
+                        }
+                    }
+                }
+                break;
+            case BISHOP:
+                positionsibilities_get_bishop(plg, from, nested);
+                break;
+            case ROOK:
+                positionsibilities_get_rook(plg, from, nested);
+                break;
+            case QUEEN:
+                positionsibilities_get_rook(plg, from, nested);
+                positionsibilities_get_bishop(plg, from, nested);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+}
+void possibilities_get_all(plg_playground *plg, int nested)
 {
     int x, y;
     for (x = 0; x < 8; x++)
     {
         for (y = 0; y < 8; y++)
         {
-            if (get_team(plg->table[x][y]) == plg->turn)
-            {
-                position from = pos_new(x, y);
-                {
-                    switch (plg->table[x][y] & 0x0F0)
-                    {
-                    case PAWN:
-                    {
-                        int ret = positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, 1), MVT_CANT_EAT, nested);
-                        if ((ret == 1 || ret == -1) &&
-                            has_moved(plg->table[x][y]) == 0)
-                            positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, 2), MVT_CANT_EAT, nested);
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, 1), MVT_MUST_EAT, nested);
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, 1), MVT_MUST_EAT, nested);
-                    }
-                    break;
-                    case KNIGHT:
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(-2, 1), MVT_CAN_EAT, nested);
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(-2, -1), MVT_CAN_EAT, nested);
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(2, 1), MVT_CAN_EAT, nested);
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(2, -1), MVT_CAN_EAT, nested);
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, 2), MVT_CAN_EAT, nested);
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, 2), MVT_CAN_EAT, nested);
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, -2), MVT_CAN_EAT, nested);
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, -2), MVT_CAN_EAT, nested);
-                        break;
-                    case KING:
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, 1), MVT_CAN_EAT, nested);
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, -1), MVT_CAN_EAT, nested);
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, -1), MVT_CAN_EAT, nested);
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, 1), MVT_CAN_EAT, nested);
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, 1), MVT_CAN_EAT, nested);
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(1, 0), MVT_CAN_EAT, nested);
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(0, -1), MVT_CAN_EAT, nested);
-                        positionsibilities_add(plg, &plg->possibilities, from, pos_new(-1, 0), MVT_CAN_EAT, nested);
-                        /* RocK */
-                        if (!has_moved(plg->table[x][y]))
-                        {
-                            int x1;
-                            if (plg->table[0][y] == (ROOK | plg->turn))
-                            {
-                                if (!has_moved(plg->table[0][y]))
-                                {
-                                    int empty = 1;
-                                    for (x1 = 1; x1 < x; x1++)
-                                    {
-                                        if (plg->table[x1][y] != EMPTY)
-                                        {
-                                            empty = 0;
-                                            break;
-                                        }
-                                    }
-                                    if (empty)
-                                    {
-                                        movement *mov = mov_new_complicated(plg, pos_new(x, y), pos_new(x - 2, y), pos_new(0, y), pos_new(x - 1, y));
-                                        possibilities_add_nocheck(plg, mov);
-                                    }
-                                }
-                            }
-                            if (plg->table[7][y] == (ROOK | plg->turn))
-                            {
-                                if (!has_moved(plg->table[7][y]))
-                                {
-                                    int empty = 1;
-                                    for (x1 = x + 1; x1 < 7; x1++)
-                                    {
-                                        if (plg->table[x1][y] != EMPTY)
-                                        {
-                                            empty = 0;
-                                            break;
-                                        }
-                                    }
-                                    if (empty)
-                                    {
-                                        movement *mov = mov_new_complicated(plg, pos_new(x, y), pos_new(x + 2, y), pos_new(7, y), pos_new(x + 1, y));
-                                        possibilities_add_nocheck(plg, mov);
-                                    }
-                                }
-                            }
-                        }
-                        break;
-                    case BISHOP:
-                        positionsibilities_get_bishop(plg, from, nested);
-                        break;
-                    case ROOK:
-                        positionsibilities_get_rook(plg, from, nested);
-                        break;
-                    case QUEEN:
-                        positionsibilities_get_rook(plg, from, nested);
-                        positionsibilities_get_bishop(plg, from, nested);
-                        break;
-                    default:
-                        break;
-                    }
-                }
-            }
+            possibilities_get_at(plg, pos_new(x, y), nested);
         }
     }
 }

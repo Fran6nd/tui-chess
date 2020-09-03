@@ -23,7 +23,7 @@ struct playground {
   int top_team;
 };
 plg_playground plg_new();
-void possibilities_get(plg_playground *, int);
+void possibilities_get_all(plg_playground *, int);
 void possibilities_free(possibilities *);
 void plg_move(plg_playground * plg, position from, position to);
 
